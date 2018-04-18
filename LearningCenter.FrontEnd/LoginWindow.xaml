@@ -1,11 +1,11 @@
-﻿<Window x:Class="LearningCenter.FrontEnd.MainWindow"
+﻿<Window x:Class="LearningCenter.FrontEnd.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LearningCenter.FrontEnd"
         mc:Ignorable="d"
-        Title="Estepp's Learning Center" Height="147.626" Width="337.291"
+        Title="Learning Center" Height="147.626" Width="337.291"
         ResizeMode="NoResize">
     <Grid >
         <Label Content="Employee ID:" Margin="10,10,0,0" HorizontalAlignment="Left" Width="86" Height="25" VerticalAlignment="Top"/>

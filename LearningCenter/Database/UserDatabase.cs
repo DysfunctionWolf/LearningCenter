@@ -8,28 +8,12 @@ using MySql.Data.MySqlClient;
 
 namespace LearningCenter.Database
 {
-    public class UserDatabase
+    public class UserDatabase : Database
     {
-        String _connectionString = "";
-        MySqlConnection _connection;
 
-        public string ConnectionString
+        public UserDatabase(MySqlConnection connection)
         {
-            get
-            {
-                return _connectionString;
-            }
-
-            set
-            {
-                _connectionString = value;
-            }
-        }
-
-        public UserDatabase(string connectionString)
-        {
-            _connectionString = connectionString;
-            _connection = new MySqlConnection(_connectionString);
+            AssignConnection(connection);
         }
 
         public User GetUserByID(int id)
@@ -38,8 +22,9 @@ namespace LearningCenter.Database
             {
                 _connection.Open();
                 MySqlDataReader reader = GetReader(String.Format(@"SELECT * FROM users WHERE id='{0}';", id), _connection);
+                User returnUser = UsersFromReader(reader)[0];
                 _connection.Close();
-                return UsersFromReader(reader)[0];
+                return returnUser;
             }
         }
 
@@ -56,15 +41,34 @@ namespace LearningCenter.Database
             return returnUsers;
         }
 
-        public void AddUser(User user)
+        public List<User> GetAllSubordinates(User Superior)
         {
+            List<User> returnUsers = new List<User>();
+            using (_connection)
+            {
+                _connection.Open();
+                string command = string.Format(@"SELECT * FROM users WHERE id in (SELECT employee_id FROM employee_hierarchey where superior_id = '{0}');", Superior.ID);
+                MySqlDataReader reader = GetReader(command, _connection);
+                returnUsers.AddRange(UsersFromReader(reader));
+                _connection.Close();
+            }
+            return returnUsers;
+        }
+
+        public int AddUser(User user)
+        {
+            int newId = -1;
             using (_connection)
             {
                 try
                 {
                     _connection.Open();
-                    string commandString = string.Format(@"INSERT INTO users(firstname, lastname, password) VALUES('{0}', '{1}', '1234');", user.FirstName, user.LastName);
-                    new MySqlCommand(commandString, _connection).ExecuteNonQuery();
+                    string commandString = string.Format(@"INSERT INTO users(firstname, lastname, password) VALUES('{0}', '{1}', '1234'); SELECT * FROM `users` WHERE `id`= LAST_INSERT_ID();", user.FirstName, user.LastName);
+                    MySqlDataReader reader = GetReader(commandString, _connection);
+                    if (reader.Read())
+                    {
+                        newId = (int)reader[0];
+                    }
                     _connection.Close();
                 }
                 catch (InvalidOperationException e)
@@ -76,6 +80,7 @@ namespace LearningCenter.Database
                     Console.WriteLine(e.Message);
                 }
             }
+            return newId;
         }
 
         public bool VerifyUser(int userID, string userPassword)
@@ -123,30 +128,20 @@ namespace LearningCenter.Database
             {
                 sb.Append(string.Format(@"DELETE FROM users WHERE id='{0}';", user.ID));
             }
-
-            using (_connection)
-            {
-                try
-                {
-                    _connection.Open();
-                    new MySqlCommand(sb.ToString(), _connection).ExecuteNonQuery();
-                    _connection.Close();
-                }
-                catch (InvalidOperationException e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-                catch (MySqlException e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
+            ExecuteNonQuery(sb.ToString());
         }
 
         public void EditUser(User editedUser)
         {
-            String queryString = string.Format(@"UPDATE users SET firstname='{0}', lastname='{1}' WHERE id='{2}';", editedUser.FirstName, editedUser.LastName, editedUser.ID);
+            String queryString = string.Format(
+                @"UPDATE users SET firstname='{0}', lastname='{1}' WHERE id='{2}';"
+                , editedUser.FirstName, editedUser.LastName, editedUser.ID);
 
+            ExecuteNonQuery(queryString);
+        }
+
+        protected void ExecuteNonQuery(string queryString)
+        {
             using (_connection)
             {
                 try

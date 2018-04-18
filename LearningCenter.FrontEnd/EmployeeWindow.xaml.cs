@@ -64,8 +64,15 @@ namespace LearningCenter.FrontEnd
 
         private void AddUserToDB(User user)
         {
-            _userDB.AddUser(user);
+            int newUserId = _userDB.AddUser(user);
+            AssignSuperior(newUserId);
             _employees.Invalidate();
+        }
+
+        private void AssignSuperior(int subordinateID)
+        {
+            EmployeeHierarchyDatabase database = new EmployeeHierarchyDatabase(_userDB.Connection);
+            database.AssignSuperior(subordinateID, _employees.UserContext.ID);
         }
 
         private void EditUserOnDB(User user)

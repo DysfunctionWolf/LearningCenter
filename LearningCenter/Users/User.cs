@@ -44,6 +44,10 @@ namespace LearningCenter.Users
             {
                 return _id;
             }
+            set
+            {
+                _id = value;
+            }
         }
 
         public User(int id, string firstName, string lastName)

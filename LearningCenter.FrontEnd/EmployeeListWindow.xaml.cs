@@ -24,13 +24,22 @@ namespace LearningCenter.FrontEnd
         public List<User> _users = new List<User>();
         string _connectionString = System.Environment.GetEnvironmentVariable("CONNECTIONSTRING", EnvironmentVariableTarget.Machine);
         UserDatabase _userDB;
+        User _userContext;
 
-        public EmployeeListWindow()
+        public User UserContext
         {
+            get
+            {
+                return _userContext;
+            }
+        }
+
+        public EmployeeListWindow(User userContext)
+        {
+            _userContext = userContext;
             InitializeComponent();
             DataContext = this;
-            _userDB = new UserDatabase(_connectionString);
-            Console.WriteLine(_connectionString);
+            _userDB = DatabaseFactory.GetUserDatabase(_connectionString);
         }
 
         public void Invalidate()
@@ -53,23 +62,28 @@ namespace LearningCenter.FrontEnd
 
         private void Remove_Button_Click(object sender, RoutedEventArgs e)
         {
-            RemoveSelectedEmployees();
+            PromptRemoveEmployees();
+        }
+
+        private void PromptRemoveEmployees()
+        {
+            if (System.Windows.MessageBox.Show("Remove selected employees?", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                RemoveSelectedEmployees();
+            }
         }
 
         private void RemoveSelectedEmployees()
         {
-            if (System.Windows.MessageBox.Show("Remove selected employees?", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-            {
-                List<User> usersToRemove = new List<User>();
-                usersToRemove.AddRange(listView.SelectedItems.Cast<User>());
-                _userDB.RemoveUsers(usersToRemove);
-                Invalidate();
-            }
+            List<User> usersToRemove = new List<User>();
+            usersToRemove.AddRange(listView.SelectedItems.Cast<User>());
+            _userDB.RemoveUsers(usersToRemove);
+            Invalidate();
         }
 
         private void PopulateListview()
         {
-            _users.AddRange(_userDB.GetAllUsers());
+            _users.AddRange(_userDB.GetAllSubordinates(_userContext));
             listView.ItemsSource = _users;
         }
 

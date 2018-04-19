@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using LearningCenter.Permission;
 
 
 namespace LearningCenter.Users
@@ -13,6 +14,7 @@ namespace LearningCenter.Users
         protected int _id;
         protected string _firstName;
         protected string _lastName;
+        protected PermissionContainer _permissions = new PermissionContainer();
 
         public string FirstName
         {
@@ -47,6 +49,14 @@ namespace LearningCenter.Users
             set
             {
                 _id = value;
+            }
+        }
+
+        public PermissionContainer Permissions
+        {
+            get
+            {
+                return _permissions;
             }
         }
 

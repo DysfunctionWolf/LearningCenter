@@ -24,19 +24,10 @@ namespace LearningCenter.FrontEnd
         public List<User> _users = new List<User>();
         string _connectionString = System.Environment.GetEnvironmentVariable("CONNECTIONSTRING", EnvironmentVariableTarget.Machine);
         UserDatabase _userDB;
-        User _userContext;
+        UserContextSingleton _userContext = UserContextSingleton.GetInstance;
 
-        public User UserContext
+        public EmployeeListWindow()
         {
-            get
-            {
-                return _userContext;
-            }
-        }
-
-        public EmployeeListWindow(User userContext)
-        {
-            _userContext = userContext;
             InitializeComponent();
             DataContext = this;
             _userDB = DatabaseFactory.GetUserDatabase(_connectionString);
@@ -83,7 +74,7 @@ namespace LearningCenter.FrontEnd
 
         private void PopulateListview()
         {
-            _users.AddRange(_userDB.GetAllSubordinates(_userContext));
+            _users.AddRange(_userDB.GetAllSubordinates(_userContext.UserContext));
             listView.ItemsSource = _users;
         }
 

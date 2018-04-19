@@ -22,6 +22,7 @@ namespace LearningCenter.FrontEnd
     public partial class EmployeeWindow : Window
     {
         UserDatabase _userDB;
+        UserContextSingleton _userContext = UserContextSingleton.GetInstance;
         EmployeeListWindow _employees;
         EmployeeWindowAction _action = EmployeeWindowAction.Add;
         User _editedUser;
@@ -72,7 +73,7 @@ namespace LearningCenter.FrontEnd
         private void AssignSuperior(int subordinateID)
         {
             EmployeeHierarchyDatabase database = new EmployeeHierarchyDatabase(_userDB.Connection);
-            database.AssignSuperior(subordinateID, _employees.UserContext.ID);
+            database.AssignSuperior(subordinateID, _userContext.UserContext.ID);
         }
 
         private void EditUserOnDB(User user)

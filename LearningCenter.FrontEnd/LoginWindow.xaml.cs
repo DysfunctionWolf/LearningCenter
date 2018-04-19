@@ -1,17 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using LearningCenter.Database;
 using LearningCenter.Users;
 
@@ -23,7 +11,7 @@ namespace LearningCenter.FrontEnd
     public partial class LoginWindow : Window
     {
         UserDatabase _userDB = DatabaseFactory.GetUserDatabase(System.Environment.GetEnvironmentVariable("CONNECTIONSTRING", EnvironmentVariableTarget.Machine));
-        User _authenticatedUser;
+        UserContextSingleton _userContext = UserContextSingleton.GetInstance;
 
         public LoginWindow()
         {
@@ -40,8 +28,8 @@ namespace LearningCenter.FrontEnd
         {
             if (_userDB.VerifyUser(id, password))
             {
-                _authenticatedUser = _userDB.GetUserByID(id);
-                TrainingWindow window = new TrainingWindow(_authenticatedUser);
+                _userContext.UserContext = _userDB.GetUserByID(id);
+                TrainingWindow window = new TrainingWindow();
                 window.Show();
             }
             else

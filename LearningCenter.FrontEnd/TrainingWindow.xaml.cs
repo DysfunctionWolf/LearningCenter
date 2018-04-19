@@ -9,17 +9,14 @@ namespace LearningCenter.FrontEnd
     /// </summary>
     public partial class TrainingWindow : Window
     {
-        User _userContext;
-
-        public TrainingWindow(User userContext)
+        public TrainingWindow()
         {
-            _userContext = userContext;
             InitializeComponent();
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
-            EmployeeListWindow employeeWindow = new EmployeeListWindow(_userContext);
+            EmployeeListWindow employeeWindow = new EmployeeListWindow();
             employeeWindow.Show();
         }
     }
